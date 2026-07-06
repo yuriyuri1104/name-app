@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이름 획수 궁합 테스트</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        
+        .fade-in-up {
+            opacity: 0;
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+        .animate-pop {
+            opacity: 0;
+            animation: pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+            animation-delay: 4s;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-pink-50 to-rose-100 flex items-center justify-center p-4 text-gray-800">
+
+    <!-- 배경 장식용 원형들 -->
+    <div class="fixed top-10 left-10 w-32 h-32 bg-pink-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob pointer-events-none"></div>
+    <div class="fixed top-10 right-10 w-32 h-32 bg-rose-300 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-2000 pointer-events-none"></div>
+    <div class="fixed -bottom-8 left-1/2 w-40 h-40 bg-pink-400 rounded-full mix-blend-multiply filter blur-2xl opacity-30 animate-blob animation-delay-4000 pointer-events-none"></div>
+
+    <div class="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden ring-1 ring-black/5 relative z-10">
+        
+        <!-- 헤더 부분 -->
+        <div class="bg-pink-500 p-6 text-center text-white relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xOSAxNGwtNyA3LTctNy1hNSA1IDAgMCAxIDAtNyA1IDUgMCAwIDEgNyA1IDUgMCAwIDEgNyAwbDAgMnoiLz48L3N2Zz4=')] bg-[length:32px_32px]"></div>
+            <i data-lucide="heart" class="w-12 h-12 mx-auto mb-2 text-pink-100 fill-current animate-pulse"></i>
+            <h1 class="text-2xl font-bold tracking-tight">이름 획수 궁합 테스트</h1>
+            <p class="text-pink-100 text-sm mt-1">우리 둘은 얼마나 잘 맞을까?</p>
+        </div>
+
+        <div class="p-6 min-h-[300px]">
+            
+            <!-- 1. 입력 화면 -->
+            <div id="input-section" class="space-y-6 block">
+                <div class="flex gap-4">
+                    <div class="flex-1 space-y-2">
+                        <label class="text-sm font-semibold text-gray-600 ml-1">나의 이름</label>
+                        <input type="text" id="name1" placeholder="홍길동" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:bg-white transition-all text-center text-lg" />
+                    </div>
+                    <div class="flex items-center justify-center pt-8">
+                        <i data-lucide="heart" class="w-6 h-6 text-pink-300 fill-current"></i>
+                    </div>
+                    <div class="flex-1 space-y-2">
+                        <label class="text-sm font-semibold text-gray-600 ml-1">상대의 이름</label>
+                        <input type="text" id="name2" placeholder="김철수" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 focus:bg-white transition-all text-center text-lg" />
+                    </div>
+                </div>
+
+                <!-- 에러 메시지 -->
+                <div id="error-msg" class="hidden items-center gap-2 text-red-500 text-sm bg-red-50 p-3 rounded-lg fade-in-up">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    <span id="error-text">이름을 입력해주세요.</span>
+                </div>
+
+                <button id="calc-btn" class="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-xl font-bold text-lg shadow-md shadow-pink-200 transform transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    궁합 확인하기
+                </button>
+            </div>
+
+            <!-- 2. 계산 중 & 결과 화면 -->
+            <div id="result-section" class="hidden space-y-8 py-4">
+                <!-- 피라미드가 렌더링될 영역 -->
+                <div id="pyramid-container" class="flex flex-col items-center gap-2"></div>
+
+                <!-- 최종 퍼센트 & 메시지 영역 -->
+                <div id="final-result" class="hidden pt-6 text-center">
+                    <div class="relative inline-block">
+                        <i data-lucide="heart" class="w-32 h-32 text-rose-500 fill-current"></i>
+                        <div id="final-score" class="absolute inset-0 flex items-center justify-center text-white text-4xl font-black drop-shadow-md">
+                            0%
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 space-y-4 fade-in-up">
+                        <p id="result-text" class="text-lg font-medium text-gray-800 px-4 bg-pink-50 py-3 rounded-xl border border-pink-100">
+                            결과 메시지
+                        </p>
+                        <button id="reset-btn" class="mx-auto flex items-center gap-2 px-6 py-2.5 text-pink-600 hover:text-pink-700 font-medium bg-white border-2 border-pink-200 hover:border-pink-300 rounded-full transition-colors">
+                            <i data-lucide="refresh-ccw" class="w-4 h-4"></i>
+                            다시 하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Lucide 아이콘 초기화
+        lucide.createIcons();
+
+        // 한글 자음, 모음, 받침 획수 데이터
+        const choStrokes = [2, 4, 2, 3, 6, 5, 4, 4, 8, 2, 4, 1, 3, 6, 4, 3, 4, 4, 3]; // ㄱ ~ ㅎ
+        const jungStrokes = [2, 3, 3, 4, 2, 3, 3, 4, 2, 4, 5, 3, 3, 2, 4, 5, 3, 3, 1, 2, 1]; // ㅏ ~ ㅣ
+        const jongStrokes = [0, 2, 4, 4, 2, 5, 5, 3, 5, 7, 9, 9, 7, 9, 9, 8, 4, 4, 6, 2, 4, 1, 3, 4, 3, 4, 4, 3]; // 없음 ~ ㅎ
+
+        // 글자 획수 계산 함수
+        const getStrokeCount = (char) => {
+            const charCode = char.charCodeAt(0);
+            if (charCode < 0xAC00 || charCode > 0xD7A3) return 0;
+
+            const offset = charCode - 0xAC00;
+            const jongIdx = offset % 28;
+            const jungIdx = Math.floor((offset - jongIdx) / 28) % 21;
+            const choIdx = Math.floor((offset - jongIdx) / 28 / 21);
+
+            return choStrokes[choIdx] + jungStrokes[jungIdx] + jongStrokes[jongIdx];
+        };
+
+        // DOM 요소 캐싱
+        const name1Input = document.getElementById('name1');
+        const name2Input = document.getElementById('name2');
+        const calcBtn = document.getElementById('calc-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const errorText = document.getElementById('error-text');
+        
+        const inputSection = document.getElementById('input-section');
+        const resultSection = document.getElementById('result-section');
+        const pyramidContainer = document.getElementById('pyramid-container');
+        const finalResult = document.getElementById('final-result');
+        const finalScore = document.getElementById('final-score');
+        const resultText = document.getElementById('result-text');
+
+        // 결과 메시지 함수
+        const getResultMessage = (score) => {
+            if (score >= 90) return "천생연분! 당장 결혼식장 예약하세요! 💍";
+            if (score >= 70) return "찰떡궁합! 서로에게 아주 좋은 인연이에요. 💖";
+            if (score >= 50) return "평범한 궁합! 서로 맞춰가는 재미가 있겠네요. 😊";
+            if (score >= 30) return "노력이 필요한 관계! 서로 더 많이 이해해주세요. 🌱";
+            return "앗... 재미는 재미일 뿐! 너무 맹신하지 마세요! 😅";
+        };
+
+        // 에러 표시
+        const showError = (msg) => {
+            errorText.textContent = msg;
+            errorMsg.classList.remove('hidden');
+            errorMsg.classList.add('flex');
+        };
+
+        // 에러 숨기기
+        const hideError = () => {
+            errorMsg.classList.add('hidden');
+            errorMsg.classList.remove('flex');
+        };
+
+        // 유효성 검사
+        const validateNames = (n1, n2) => {
+            const hangulRegex = /^[가-힣]+$/;
+            if (!n1 || !n2) {
+                showError('두 사람의 이름을 모두 입력해주세요.');
+                return false;
+            }
+            if (!hangulRegex.test(n1) || !hangulRegex.test(n2)) {
+                showError('이름은 한글로만 입력해주세요.');
+                return false;
+            }
+            if (n1.length > 5 || n2.length > 5) {
+                showError('이름은 5글자 이하로 입력해주세요.');
+                return false;
+            }
+            hideError();
+            return true;
+        };
+
+        // 메인 계산 함수
+        const calculateCompatibility = () => {
+            const n1 = name1Input.value.trim();
+            const n2 = name2Input.value.trim();
+
+            if (!validateNames(n1, n2)) return;
+
+            // 이름 섞기
+            let combinedChars = [];
+            const maxLength = Math.max(n1.length, n2.length);
+            for (let i = 0; i < maxLength; i++) {
+                if (n1[i]) combinedChars.push(n1[i]);
+                if (n2[i]) combinedChars.push(n2[i]);
+            }
+
+            // 획수 및 피라미드 계산
+            const initialStrokes = combinedChars.map(getStrokeCount);
+            let rows = [initialStrokes];
+            let currentRow = initialStrokes;
+
+            while (currentRow.length > 2) {
+                let nextRow = [];
+                for (let i = 0; i < currentRow.length - 1; i++) {
+                    nextRow.push((currentRow[i] + currentRow[i + 1]) % 10);
+                }
+                rows.push(nextRow);
+                currentRow = nextRow;
+            }
+
+            // UI 전환
+            inputSection.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            finalResult.classList.add('hidden');
+            finalResult.classList.remove('animate-pop');
+            pyramidContainer.innerHTML = '';
+
+            // 1. 이름 교차 출력 렌더링
+            const charsDiv = document.createElement('div');
+            charsDiv.className = 'flex justify-center gap-1 sm:gap-2 mb-4';
+            combinedChars.forEach(char => {
+                const charBox = document.createElement('div');
+                charBox.className = 'w-8 h-10 sm:w-10 sm:h-12 flex items-center justify-center text-xl sm:text-2xl font-bold text-gray-800 border-b-2 border-pink-300 pb-1';
+                charBox.textContent = char;
+                charsDiv.appendChild(charBox);
+            });
+            pyramidContainer.appendChild(charsDiv);
+
+            // 2. 피라미드 렌더링 (애니메이션 적용)
+            rows.forEach((row, rowIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex gap-1 sm:gap-2 fade-in-up';
+                rowDiv.style.animationDelay = `${rowIndex * 0.2}s`;
+                
+                row.forEach((num) => {
+                    const numBox = document.createElement('div');
+                    numBox.className = `w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base ${
+                        rowIndex === 0 ? 'bg-pink-100 text-pink-700' : 'bg-gray-50 text-gray-600 border border-gray-100'
+                    }`;
+                    numBox.textContent = num;
+                    rowDiv.appendChild(numBox);
+                });
+                
+                pyramidContainer.appendChild(rowDiv);
+            });
+
+            // 3. 최종 결과 표시 타이머 설정
+            const finalScoreValue = parseInt(rows[rows.length - 1].join(''));
+            setTimeout(() => {
+                finalScore.textContent = `${finalScoreValue}%`;
+                resultText.textContent = getResultMessage(finalScoreValue);
+                finalResult.classList.remove('hidden');
+                finalResult.classList.add('animate-pop');
+            }, rows.length * 200 + 400); // 피라미드 애니메이션이 끝난 후 실행
+        };
+
+        // 초기화 함수
+        const reset = () => {
+            name1Input.value = '';
+            name2Input.value = '';
+            hideError();
+            resultSection.classList.add('hidden');
+            inputSection.classList.remove('hidden');
+            name1Input.focus();
+        };
+
+        // 이벤트 리스너 등록
+        calcBtn.addEventListener('click', calculateCompatibility);
+        resetBtn.addEventListener('click', reset);
+        
+        // 엔터키 입력 지원
+        [name1Input, name2Input].forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') calculateCompatibility();
+            });
+        });
+    </script>
+</body>
+</html>
